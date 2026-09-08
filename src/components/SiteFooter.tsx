@@ -1,6 +1,7 @@
 import { Link } from "@tanstack/react-router";
-import { Activity, Facebook, Github, Instagram, Twitter } from "lucide-react";
+import { Facebook, Github, Instagram, Twitter } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import logoMark from "@/assets/logo-mark.png";
 
 type FooterLink = { label: string; to: string };
 
@@ -45,10 +46,8 @@ export function SiteFooter() {
         <div className="grid md:grid-cols-6 gap-10">
           <div className="md:col-span-2">
             <Link to="/" className="flex items-center gap-2">
-              <div className="size-9 rounded-xl bg-[#14b8a6] flex items-center justify-center">
-                <Activity className="size-5 text-white" />
-              </div>
-              <span className="font-display text-lg font-bold text-white">physioapp</span>
+              <img src={logoMark} alt="PhysioApp" className="size-10 object-contain" />
+              <span className="font-display text-lg font-bold text-white">PhysioApp</span>
             </Link>
             <p className="mt-4 text-white/60 text-sm max-w-xs">
               The physio software that shows recovery, not just records it.

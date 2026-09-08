@@ -1,6 +1,7 @@
 import { Link } from "@tanstack/react-router";
-import { Activity, ArrowUpRight } from "lucide-react";
+import { ArrowUpRight } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import logoMark from "@/assets/logo-mark.png";
 
 const NAV_LINKS = ["Features", "Product", "Pricing", "FAQ"];
 
@@ -9,10 +10,8 @@ export function SiteNav() {
     <nav className="sticky top-4 z-40 w-full flex justify-center px-4">
       <div className="inline-flex items-center gap-2 rounded-full bg-white/85 backdrop-blur border border-[#0F172A]/10 pl-2 pr-2 py-2 shadow-sm">
         <Link to="/" className="flex items-center gap-2 pl-1">
-          <div className="size-9 rounded-xl bg-[#14b8a6] flex items-center justify-center">
-            <Activity className="size-5 text-white" />
-          </div>
-          <span className="font-display text-base font-bold tracking-tight">physioapp</span>
+          <img src={logoMark} alt="PhysioApp" className="size-9 object-contain" />
+          <span className="font-display text-base font-bold tracking-tight">PhysioApp</span>
         </Link>
         <div className="hidden md:flex items-center gap-0.5 text-sm font-medium text-[#0F172A]/70 ml-3">
           {NAV_LINKS.map((l) => (

@@ -35,10 +35,10 @@ function PrivacyPolicy() {
         <p>
           When a clinic signs up for PhysioApp, we collect information needed to create and run the
           account, including: clinic/business name and branch details, admin and staff names, email
-          addresses, phone numbers, role/permission level, login credentials, and — for the Chain
-          plan — SSO identity provider details. We use this information to provision the account,
-          authenticate users, enforce role-based access within a clinic, and communicate service
-          updates, billing notices and support responses.
+          addresses, phone numbers, role/permission level, login credentials, and — for the
+          Enterprise plan — SSO identity provider details. We use this information to provision the
+          account, authenticate users, enforce role-based access within a clinic, and communicate
+          service updates, billing notices and support responses.
         </p>
       </section>
 
