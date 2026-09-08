@@ -68,12 +68,12 @@ function TermsOfService() {
       <section id="subscription-payment">
         <h2>4. Subscription / Payment</h2>
         <p>
-          PhysioApp is offered on the Starter, Clinic and Chain subscription plans described on our{" "}
-          <a href="/#pricing">pricing page</a>, billed monthly unless otherwise agreed. Subscription
-          fees are exclusive of applicable taxes (including GST) unless stated otherwise. Fees are
-          non-refundable except where required by law or expressly stated at purchase. We may change
-          pricing on renewal with advance notice. Failure to pay may result in suspension of access
-          until the account is brought current.
+          PhysioApp is offered on the Starter, Advance and Enterprise subscription plans described
+          on our <a href="/#pricing">pricing page</a>, billed monthly unless otherwise agreed.
+          Subscription fees are exclusive of applicable taxes (including GST) unless stated
+          otherwise. Fees are non-refundable except where required by law or expressly stated at
+          purchase. We may change pricing on renewal with advance notice. Failure to pay may result
+          in suspension of access until the account is brought current.
         </p>
       </section>
 
@@ -133,8 +133,8 @@ function TermsOfService() {
           requests), and PhysioApp is responsible for processing that data securely and only in
           accordance with those instructions and our <a href="/privacy-policy">Privacy Policy</a>.
           Where required, the parties will enter into a separate data processing agreement
-          (available on the Chain plan) governing sub-processor use, breach notification, and audit
-          rights.
+          (available on the Enterprise plan) governing sub-processor use, breach notification, and
+          audit rights.
         </p>
       </section>
 

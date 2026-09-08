@@ -10,6 +10,26 @@ import { motion, useInView, AnimatePresence } from "framer-motion";
 import { useEffect, useRef, useState } from "react";
 import useEmblaCarousel from "embla-carousel-react";
 import logoMark from "@/assets/logo-mark.png";
+import { getVisitorCountry } from "@/lib/geo";
+import {
+  Activity,
+  ArrowUpRight,
+  Building2,
+  Calendar,
+  Check,
+  CreditCard,
+  Dumbbell,
+  Facebook,
+  FileText,
+  Github,
+  Instagram,
+  MessageCircle,
+  ScanLine,
+  Send,
+  Twitter,
+  UserPlus,
+  Wallet,
+} from "lucide-react";
 
 import {
   Hero,
@@ -27,6 +47,7 @@ import { PatientFlow } from "@/components/site/patient-flow";
 
 export const Route = createFileRoute("/")({
   component: Index,
+  loader: async () => ({ country: await getVisitorCountry() }),
   head: () => ({
     meta: [
       { title: "PhysioApp - Your Clinic Manager" },
@@ -53,6 +74,9 @@ export const Route = createFileRoute("/")({
 ==============================================================*/
 
 function Index() {
+  const { country } = Route.useLoaderData();
+  const isUK = country === "GB";
+
   return (
     <div className="min-h-screen bg-white font-sans text-[#0F172A] overflow-x-hidden">
       <Nav />
@@ -66,11 +90,11 @@ function Index() {
         <Referrals />
         <ClinicControl />
         <PhysioDay />
-        <FeatureWheel />
+        <FeatureWheel isUK={isUK} />
         <PatientFlow />
         <BuiltForEveryone />
 
-        <Pricing />
+        <Pricing isUK={isUK} />
         <FAQ />
         <ClosingCTA />
       </main>
@@ -109,7 +133,7 @@ function Nav() {
         </div>
 
         <Button className="rounded-full bg-[#F97316] hover:bg-[#ea6a10] text-white shadow-md h-9 px-4 ml-2 text-sm">
-          Request Demo <img src={logoMark} alt="" className="size-4 object-contain" />
+          Request Demo <ArrowUpRight className="size-4" />
         </Button>
       </div>
     </nav>
@@ -146,6 +170,7 @@ function FeatureHub() {
   type Node = {
     key: string;
     label: string;
+    icon: typeof Activity;
     x: number;
     y: number;
     forkX: number; // where the branch meets the spine
@@ -160,6 +185,7 @@ function FeatureHub() {
     {
       key: "patient",
       label: "Patient",
+      icon: UserPlus,
       x: SPINE_X1,
       y: SPINE_Y,
       forkX: SPINE_X1,
@@ -169,6 +195,7 @@ function FeatureHub() {
     {
       key: "assessment",
       label: "SVG Assessment",
+      icon: ScanLine,
       x: 150,
       y: 22,
       forkX: 245,
@@ -179,6 +206,7 @@ function FeatureHub() {
     {
       key: "hep",
       label: "Home Exercise",
+      icon: Dumbbell,
       x: 260,
       y: 22,
       forkX: 400,
@@ -189,6 +217,7 @@ function FeatureHub() {
     {
       key: "whatsapp",
       label: "WhatsApp",
+      icon: MessageCircle,
       x: 250,
       y: 278,
       forkX: 355,
@@ -199,6 +228,7 @@ function FeatureHub() {
     {
       key: "clinic",
       label: "Clinic",
+      icon: Building2,
       x: SPINE_X2,
       y: SPINE_Y,
       forkX: SPINE_X2,
@@ -208,6 +238,7 @@ function FeatureHub() {
     {
       key: "billing",
       label: "Billing",
+      icon: FileText,
       x: 850,
       y: 22,
       forkX: 655,
@@ -218,6 +249,7 @@ function FeatureHub() {
     {
       key: "dashboard",
       label: "Dashboard",
+      icon: CreditCard,
       x: 785,
       y: 278,
       forkX: 700,
@@ -348,8 +380,7 @@ function FeatureHub() {
             className="mt-7"
           >
             <Button className="rounded-full bg-[#F97316] hover:bg-[#ea6a10] text-white shadow-lg px-7 py-6 text-base font-semibold">
-              Request a Demo{" "}
-              <img src={logoMark} alt="" className="size-4 ml-1 object-contain" />
+              Request a Demo <ArrowUpRight className="size-4 ml-1" />
             </Button>
           </motion.div>
         </div>
@@ -481,6 +512,7 @@ function HubNode({
   node: {
     key: string;
     label: string;
+    icon: typeof Activity;
     x: number;
     y: number;
     bg: string;
@@ -492,6 +524,7 @@ function HubNode({
   stageH: number;
 }) {
   const [hover, setHover] = useState(false);
+  const Icon = node.icon;
   return (
     <motion.div
       className="absolute -translate-x-1/2 -translate-y-1/2 z-20"
@@ -519,7 +552,7 @@ function HubNode({
           className="size-16 rounded-2xl flex items-center justify-center shadow-[0_12px_30px_-8px_rgba(15,23,42,0.25)] ring-1 ring-black/5 cursor-pointer"
           style={{ backgroundColor: node.bg, color: node.fg }}
         >
-          <img src={logoMark} alt="" className="size-7 object-contain" />
+          <Icon className="size-7" />
         </motion.div>
 
         <AnimatePresence>
@@ -543,11 +576,12 @@ function HubNode({
 /* ============================================================
    EXPLORE EACH FEATURE — premium bento grid, hover-reactive
    ============================================================ */
-function FeatureWheel() {
+function FeatureWheel({ isUK }: { isUK: boolean }) {
   const items = [
     {
       title: "Patient Intake",
       desc: "Digital forms filled in two minutes. Consent captured over WhatsApp before the first visit.",
+      icon: UserPlus,
       span: "md:col-span-2",
       accent: "from-[#F0FDFA] to-white",
       dot: "#14b8a6",
@@ -555,6 +589,7 @@ function FeatureWheel() {
     {
       title: "SVG Assessment",
       desc: "Tap the body — mark the pain. Compare visits side-by-side and watch recovery draw itself.",
+      icon: ScanLine,
       span: "md:col-span-2 md:row-span-2",
       accent: "from-[#0F172A] to-[#14b8a6]",
       dot: "#ffffff",
@@ -563,6 +598,7 @@ function FeatureWheel() {
     {
       title: "WhatsApp Reminders",
       desc: "94% open rate. Exercise nudges, appointment confirms and payment follow-ups — automated.",
+      icon: MessageCircle,
       span: "md:col-span-2",
       accent: "from-[#DCFCE7] to-white",
       dot: "#15803D",
@@ -570,13 +606,17 @@ function FeatureWheel() {
     {
       title: "Home Exercise",
       desc: "Personalised video plans. Track completion daily.",
+      icon: Dumbbell,
       span: "md:col-span-2",
       accent: "from-[#E9D5FF] to-white",
       dot: "#6D28D9",
     },
     {
-      title: "UPI Billing",
-      desc: "GST-ready invoices in seconds. UPI collect in one tap, auto-reconciled.",
+      title: isUK ? "Billing & Invoicing" : "UPI Billing",
+      desc: isUK
+        ? "VAT-ready invoices in seconds. Card and bank payments, auto-reconciled."
+        : "GST-ready invoices in seconds. UPI collect in one tap, auto-reconciled.",
+      icon: Wallet,
       span: "md:col-span-2",
       accent: "from-[#FFE4E6] to-white",
       dot: "#BE123C",
@@ -584,6 +624,7 @@ function FeatureWheel() {
     {
       title: "Branch Management",
       desc: "Unified view across every location. Per-branch revenue, load and recovery trends.",
+      icon: Building2,
       span: "md:col-span-2",
       accent: "from-[#CFFAFE] to-white",
       dot: "#0E7490",
@@ -591,6 +632,7 @@ function FeatureWheel() {
     {
       title: "Recovery Dashboard",
       desc: "Everything, at a glance. Weekly trends, drop-off risks, therapist load.",
+      icon: Activity,
       span: "md:col-span-2",
       accent: "from-[#FED7AA] to-white",
       dot: "#C2410C",
@@ -598,6 +640,7 @@ function FeatureWheel() {
     {
       title: "Referral Reports",
       desc: "One tap sends the recovery report to the referring doctor. They see results. They send more patients.",
+      icon: FileText,
       span: "md:col-span-2",
       accent: "from-[#FCE7F3] to-white",
       dot: "#BE185D",
@@ -639,6 +682,7 @@ function BentoTile({
   item: {
     title: string;
     desc: string;
+    icon: typeof Activity;
     span: string;
     accent: string;
     dot: string;
@@ -646,6 +690,7 @@ function BentoTile({
   };
   index: number;
 }) {
+  const Icon = item.icon;
   return (
     <motion.div
       initial={{ opacity: 0, y: 24 }}
@@ -667,7 +712,7 @@ function BentoTile({
             color: item.dot,
           }}
         >
-          <img src={logoMark} alt="" className="size-6 object-contain" />
+          <Icon className="size-6" />
         </div>
         <h3
           className={`mt-6 font-display text-2xl font-bold tracking-tight ${item.dark ? "text-white" : "text-[#0F172A]"}`}
@@ -682,7 +727,7 @@ function BentoTile({
         <div
           className={`mt-auto pt-6 flex items-center gap-1.5 text-xs font-semibold tracking-wide uppercase ${item.dark ? "text-white/90" : "text-[#14b8a6]"} opacity-0 -translate-x-2 transition-all duration-300 group-hover:opacity-100 group-hover:translate-x-0`}
         >
-          Learn more <img src={logoMark} alt="" className="size-3.5 object-contain" />
+          Learn more <ArrowUpRight className="size-3.5" />
         </div>
       </div>
     </motion.div>
@@ -842,7 +887,7 @@ function DashboardScreen() {
                 key={u}
                 className="flex items-center gap-2 rounded-lg border border-[#0F172A]/10 px-3 py-2 text-xs"
               >
-                <img src={logoMark} alt="" className="size-4 object-contain" />
+                <Calendar className="size-4 text-[#14b8a6]" />
                 {u}
               </div>
             ),
@@ -863,7 +908,7 @@ function DashboardScreen() {
             ].map((r) => (
               <li key={r.n} className="flex items-center justify-between text-xs">
                 <span className="flex items-center gap-2 text-[#0F172A]/80">
-                  <img src={logoMark} alt="" className="size-3.5 object-contain" />
+                  <UserPlus className="size-3.5 text-[#BE185D]" />
                   {r.n}
                 </span>
                 <span className="font-semibold text-[#0F172A]">{r.p} patients</span>
@@ -957,7 +1002,7 @@ function WhatsAppScreen() {
             "Zero app install for the patient",
           ].map((l) => (
             <li key={l} className="flex gap-2">
-              <img src={logoMark} alt="" className="size-4 mt-0.5 object-contain" />
+              <Check className="size-4 mt-0.5 text-[#14b8a6]" />
               {l}
             </li>
           ))}
@@ -968,7 +1013,7 @@ function WhatsAppScreen() {
           <div className="rounded-[1.6rem] bg-[#E7F5EB] p-3 space-y-2 min-h-[340px]">
             <div className="flex items-center gap-2 pb-2 border-b border-black/5">
               <div className="size-8 rounded-full bg-[#14b8a6] flex items-center justify-center">
-                <img src={logoMark} alt="" className="size-4 object-contain" />
+                <MessageCircle className="size-4 text-white" />
               </div>
               <div>
                 <p className="text-xs font-bold">PhysioApp Clinic</p>
@@ -1031,11 +1076,7 @@ function HEPScreen() {
                   i < 3 ? "bg-[#14b8a6] text-white" : "bg-[#F0FDFA] text-[#14b8a6]"
                 }`}
               >
-                {i < 3 ? (
-                  <img src={logoMark} alt="" className="size-3.5 object-contain" />
-                ) : (
-                  i + 1
-                )}
+                {i < 3 ? <Check className="size-3.5" /> : i + 1}
               </span>
               <span className="text-sm">{e}</span>
             </li>
@@ -1046,7 +1087,7 @@ function HEPScreen() {
         <div className="w-64 rounded-[2rem] bg-[#0F172A] p-2 shadow-2xl">
           <div className="rounded-[1.6rem] bg-white p-4 min-h-[340px]">
             <div className="aspect-video rounded-xl bg-gradient-to-br from-[#14b8a6] to-[#0F172A] flex items-center justify-center mb-3">
-              <img src={logoMark} alt="" className="size-10 object-contain" />
+              <Dumbbell className="size-10 text-white" />
             </div>
             <p className="font-display font-bold text-sm">Bridge Hold</p>
             <p className="text-xs text-[#0F172A]/60 mt-1">
@@ -1085,7 +1126,7 @@ function ReferralScreen() {
             <div>
               <h3 className="font-display text-base font-bold">Anita Sharma</h3>
               <p className="text-[12px] text-[#0F172A]/60 flex items-center gap-1">
-                <img src={logoMark} alt="" className="size-3 object-contain" />
+                <UserPlus className="size-3 text-[#BE185D]" />
                 Referred by Dr. Kumar · Ortho One
               </p>
             </div>
@@ -1109,7 +1150,7 @@ function ReferralScreen() {
           </div>
 
           <button className="mt-4 w-full rounded-xl border border-[#0F172A]/15 hover:border-[#14b8a6] hover:bg-[#F0FDFA] text-sm font-semibold py-2.5 px-4 flex items-center justify-center gap-2 transition-colors">
-            <img src={logoMark} alt="" className="size-4 object-contain" />
+            <Send className="size-4" />
             Send report to Dr. Kumar
           </button>
         </div>
@@ -1125,7 +1166,7 @@ function ReferralScreen() {
 
           <div className="mt-3 flex items-center gap-2 rounded-xl border border-[#0F172A]/10 px-3 py-2.5">
             <div className="size-9 rounded-md bg-[#BE185D]/10 flex items-center justify-center">
-              <img src={logoMark} alt="" className="size-4 object-contain" />
+              <FileText className="size-4 text-[#BE185D]" />
             </div>
             <div className="min-w-0">
               <p className="text-[13px] font-bold truncate">Recovery-report-AS.pdf</p>
@@ -1146,7 +1187,7 @@ function ReferralScreen() {
           "Tracks referrals per doctor",
         ].map((t) => (
           <div key={t} className="flex items-center gap-1.5">
-            <img src={logoMark} alt="" className="size-4 object-contain" />
+            <Check className="size-4 text-[#14b8a6]" />
             <span className="font-medium">{t}</span>
           </div>
         ))}
@@ -1155,33 +1196,37 @@ function ReferralScreen() {
   );
 }
 
-function Pricing() {
+function Pricing({ isUK }: { isUK: boolean }) {
   const plans = [
     {
       n: "Starter",
-      p: "₹1,499",
+      p: isUK ? "£15" : "₹1,099",
       s: "For solo therapists",
-      feats: ["Up to 100 patients", "WhatsApp reminders", "Basic billing", "Email support"],
+      feats: [
+        "Up to 100 patients",
+        isUK ? "Billing & VAT invoicing" : "Billing & GST invoicing",
+        "Email support",
+        "Up to 2 branches",
+      ],
       hi: false,
     },
     {
-      n: "Clinic",
-      p: "₹3,999",
+      n: "Advance",
+      p: isUK ? "£45" : "₹3,499",
       s: "For growing clinics",
       feats: [
         "Unlimited patients",
-        "UPI + auto invoicing",
         "Exercise video library",
-        "SVG assessments & reports",
         "Priority support",
+        "Up to 5 branches",
       ],
       hi: true,
     },
     {
-      n: "Chain",
+      n: "Enterprise",
       p: "Custom",
       s: "For multi-branch",
-      feats: ["Everything in Clinic", "Multi-branch reports", "SSO & audit logs", "Dedicated CSM"],
+      feats: ["Everything in Advance", "Multi-branch reports", "SSO & audit logs", "Dedicated CSM"],
       hi: false,
     },
   ];
@@ -1228,11 +1273,7 @@ function Pricing() {
             <ul className="mt-6 space-y-3">
               {p.feats.map((f) => (
                 <li key={f} className="flex items-start gap-2 text-sm">
-                  <img
-                    src={logoMark}
-                    alt=""
-                    className="size-4 mt-0.5 shrink-0 object-contain"
-                  />
+                  <Check className="size-4 mt-0.5 shrink-0 text-[#14b8a6]" />
                   <span className={p.hi ? "text-white/85" : "text-[#0F172A]/80"}>{f}</span>
                 </li>
               ))}
@@ -1257,7 +1298,7 @@ function FAQ() {
     },
     {
       q: "Can I import patients from my current system?",
-      a: "Yes. We provide CSV import and a white-glove migration service on the Clinic and Chain plans.",
+      a: "Yes. We provide CSV import and a white-glove migration service on the Advance and Enterprise plans.",
     },
     {
       q: "Is my data secure?",
@@ -1265,7 +1306,7 @@ function FAQ() {
     },
     {
       q: "Can I use PhysioApp across multiple branches?",
-      a: "Absolutely. The Chain plan gives you unified reporting, branch-level settings and SSO.",
+      a: "Absolutely. The Enterprise plan gives you unified reporting, branch-level settings and SSO.",
     },
   ];
   return (
@@ -1337,13 +1378,13 @@ function Footer() {
               </form>
             </div>
             <div className="mt-6 flex items-center gap-3">
-              {[0, 1, 2, 3].map((i) => (
+              {[Twitter, Instagram, Facebook, Github].map((SocialIcon, i) => (
                 <a
                   key={i}
                   href="#"
-                  className="size-9 rounded-full bg-white/5 border border-white/10 flex items-center justify-center hover:border-[#14b8a6] transition"
+                  className="size-9 rounded-full bg-white/5 border border-white/10 flex items-center justify-center hover:text-[#14b8a6] hover:border-[#14b8a6] transition"
                 >
-                  <img src={logoMark} alt="" className="size-4 object-contain" />
+                  <SocialIcon className="size-4" />
                 </a>
               ))}
             </div>
