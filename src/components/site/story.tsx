@@ -26,6 +26,7 @@ import {
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import logoMark from "@/assets/logo-mark.png";
+import { SIGNUP_URL } from "@/lib/links";
 
 /* ============================================================
    Shared bits
@@ -80,9 +81,12 @@ export function SectionHead({
 function DemoButton({ className = "" }: { className?: string }) {
   return (
     <Button
+      asChild
       className={`h-13 md:h-14 px-7 md:px-8 rounded-full bg-[#F97316] hover:bg-[#ea6a10] text-white font-semibold text-base shadow-lg shadow-[#F97316]/30 ${className}`}
     >
-      Request a Demo <ArrowUpRight className="size-4" />
+      <a href={`${SIGNUP_URL}?plan=demo`}>
+        Request a Demo <ArrowUpRight className="size-4" />
+      </a>
     </Button>
   );
 }
@@ -200,8 +204,7 @@ export function Hero() {
           <div className="rounded-3xl bg-white border border-[#0F172A]/10 shadow-[0_40px_80px_-40px_rgba(15,23,42,0.35)] overflow-hidden">
             {/* app top bar */}
             <div className="flex items-center gap-3 px-3 sm:px-4 py-3 border-b border-[#0F172A]/8">
-              <img src={logoMark} alt="PhysioApp" className="size-7 object-contain" />
-              <span className="font-display font-bold text-sm">PhysioApp</span>
+              <img src={logoMark} alt="PhysioApp" className="size-8 rounded-full object-contain" />
               <div className="hidden sm:flex flex-1 items-center rounded-full bg-[#0F172A]/4 px-3 py-1.5 text-[11px] text-[#0F172A]/40">
                 Search patients, staff or appointments…
               </div>
@@ -1193,8 +1196,13 @@ export function MobileCTABar() {
         show ? "translate-y-0" : "translate-y-full"
       }`}
     >
-      <Button className="w-full h-12 rounded-full bg-[#F97316] hover:bg-[#ea6a10] text-white font-semibold shadow-lg">
-        Request a Demo <ArrowUpRight className="size-4" />
+      <Button
+        asChild
+        className="w-full h-12 rounded-full bg-[#F97316] hover:bg-[#ea6a10] text-white font-semibold shadow-lg"
+      >
+        <a href={`${SIGNUP_URL}?plan=demo`}>
+          Request a Demo <ArrowUpRight className="size-4" />
+        </a>
       </Button>
     </div>
   );
