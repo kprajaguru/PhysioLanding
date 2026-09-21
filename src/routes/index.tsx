@@ -11,6 +11,7 @@ import { useEffect, useRef, useState } from "react";
 import useEmblaCarousel from "embla-carousel-react";
 import logoMark from "@/assets/logo-mark.png";
 import { getVisitorCountry } from "@/lib/geo";
+import { SIGNUP_URL } from "@/lib/links";
 import {
   Activity,
   ArrowUpRight,
@@ -116,8 +117,7 @@ function Nav() {
     <nav className="sticky top-4 z-40 w-full flex justify-center px-4">
       <div className="inline-flex items-center gap-2 rounded-full bg-white/85 backdrop-blur border border-[#0F172A]/10 pl-2 pr-2 py-2 shadow-sm">
         <a href="#" className="flex items-center gap-2 pl-1">
-          <img src={logoMark} alt="PhysioApp logo" className="size-9 object-contain" />
-          <span className="font-display text-base font-bold tracking-tight">PhysioApp</span>
+          <img src={logoMark} alt="PhysioApp" className="size-10 rounded-full object-contain" />
         </a>
 
         <div className="hidden md:flex items-center gap-0.5 text-sm font-medium text-[#0F172A]/70 ml-3">
@@ -132,8 +132,13 @@ function Nav() {
           ))}
         </div>
 
-        <Button className="rounded-full bg-[#F97316] hover:bg-[#ea6a10] text-white shadow-md h-9 px-4 ml-2 text-sm">
-          Request Demo <ArrowUpRight className="size-4" />
+        <Button
+          asChild
+          className="rounded-full bg-[#F97316] hover:bg-[#ea6a10] text-white shadow-md h-9 px-4 ml-2 text-sm"
+        >
+          <a href={`${SIGNUP_URL}?plan=demo`}>
+            Request Demo <ArrowUpRight className="size-4" />
+          </a>
         </Button>
       </div>
     </nav>
@@ -379,8 +384,13 @@ function FeatureHub() {
             transition={{ duration: 0.55, delay: 0.3 }}
             className="mt-7"
           >
-            <Button className="rounded-full bg-[#F97316] hover:bg-[#ea6a10] text-white shadow-lg px-7 py-6 text-base font-semibold">
-              Request a Demo <ArrowUpRight className="size-4 ml-1" />
+            <Button
+              asChild
+              className="rounded-full bg-[#F97316] hover:bg-[#ea6a10] text-white shadow-lg px-7 py-6 text-base font-semibold"
+            >
+              <a href={`${SIGNUP_URL}?plan=demo`}>
+                Request a Demo <ArrowUpRight className="size-4 ml-1" />
+              </a>
             </Button>
           </motion.div>
         </div>
@@ -473,13 +483,12 @@ function FeatureHub() {
                     transition={{ duration: 3, repeat: Infinity, ease: "easeOut" }}
                   />
                 )}
-                <div className="relative flex items-center gap-3 rounded-2xl bg-gradient-to-br from-[#2dd4bf] to-[#0d9488] px-5 py-4 shadow-[0_20px_50px_-10px_rgba(20,184,166,0.6)]">
-                  <div className="size-10 rounded-xl bg-white/20 flex items-center justify-center">
-                    <img src={logoMark} alt="" className="size-7 object-contain" />
-                  </div>
-                  <span className="font-display text-lg font-bold text-white tracking-tight">
-                    PhysioApp
-                  </span>
+                <div className="relative flex items-center rounded-2xl bg-gradient-to-br from-[#2dd4bf] to-[#0d9488] px-5 py-4 shadow-[0_20px_50px_-10px_rgba(20,184,166,0.6)]">
+                  <img
+                    src={logoMark}
+                    alt="PhysioApp"
+                    className="size-12 rounded-full object-contain"
+                  />
                 </div>
               </div>
             </motion.div>
@@ -1262,13 +1271,16 @@ function Pricing({ isUK }: { isUK: boolean }) {
               {p.s} · per month
             </p>
             <Button
+              asChild
               className={`w-full mt-6 rounded-full h-12 font-semibold ${
                 p.hi
                   ? "bg-[#F97316] hover:bg-[#ea6a10] text-white"
                   : "bg-[#0F172A] hover:bg-[#0F172A]/90 text-white"
               }`}
             >
-              {p.hi ? "Request Demo" : "Get started"}
+              <a href={`${SIGNUP_URL}?plan=${p.n.toLowerCase()}`}>
+                {p.hi ? "Request Demo" : "Get started"}
+              </a>
             </Button>
             <ul className="mt-6 space-y-3">
               {p.feats.map((f) => (
@@ -1355,8 +1367,7 @@ function Footer() {
         <div className="grid md:grid-cols-6 gap-10">
           <div className="md:col-span-2">
             <div className="flex items-center gap-2">
-              <img src={logoMark} alt="PhysioApp logo" className="size-10 object-contain" />
-              <span className="font-display text-lg font-bold text-white">PhysioApp</span>
+              <img src={logoMark} alt="PhysioApp" className="size-14 rounded-full object-contain" />
             </div>
 
             <p className="mt-4 text-white/60 text-sm max-w-xs">
