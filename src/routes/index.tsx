@@ -110,7 +110,7 @@ function Nav() {
     { l: "How it works", h: "#how-it-works" },
     { l: "Features", h: "#features" },
     { l: "For clinics", h: "#for-clinics" },
-    { l: "Pricing", h: "#pricing" },
+    { l: "Pricing", h: "/pricing" },
   ];
   return (
     <nav className="sticky top-4 z-40 w-full flex justify-center px-4">
