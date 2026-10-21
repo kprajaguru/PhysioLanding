@@ -69,7 +69,7 @@ function TermsOfService() {
         <h2>4. Subscription / Payment</h2>
         <p>
           PhysioApp is offered on the Starter, Advance and Enterprise subscription plans described
-          on our <a href="/#pricing">pricing page</a>, billed monthly unless otherwise agreed.
+          on our <a href="/pricing">pricing page</a>, billed monthly unless otherwise agreed.
           Subscription fees are exclusive of applicable taxes (including GST) unless stated
           otherwise. Fees are non-refundable except where required by law or expressly stated at
           purchase. We may change pricing on renewal with advance notice. Failure to pay may result

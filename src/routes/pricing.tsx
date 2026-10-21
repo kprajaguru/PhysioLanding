@@ -1,3 +1,4 @@
+import { useState } from "react";
 import { createFileRoute } from "@tanstack/react-router";
 import { Check, ArrowUpRight, Gift, ShieldCheck, Sparkles, Timer } from "lucide-react";
 import { SiteNav } from "@/components/SiteNav";
@@ -7,9 +8,13 @@ import { currencyForCountry, formatPrice, CURRENCY_LABEL, type Currency } from "
 import {
   PLANS,
   COMPARISON,
+  localize,
+  yearlyDiscountPercent,
+  type BillingPeriod,
   type Plan,
   type PlanId,
   type ComparisonValue,
+  type LocalizedText,
 } from "@/lib/pricing-data";
 import { SIGNUP_URL } from "@/lib/links";
 
@@ -28,8 +33,9 @@ export const Route = createFileRoute("/pricing")({
   }),
 });
 
-function signupHref(plan: PlanId) {
-  return `${SIGNUP_URL}?plan=${plan}`;
+function signupHref(plan: PlanId, billing: BillingPeriod = "monthly") {
+  const base = `${SIGNUP_URL}?plan=${plan}`;
+  return billing === "yearly" ? `${base}&billing=yearly` : base;
 }
 
 function PricingPage() {
@@ -42,7 +48,7 @@ function PricingPage() {
       <PricingHero currency={currency} />
       <TrialBanner />
       <PlanCards currency={currency} />
-      <ComparisonTable />
+      <ComparisonTable currency={currency} />
       <SiteFooter />
     </div>
   );
@@ -149,19 +155,104 @@ function TrustPoint({ icon: Icon, label }: { icon: typeof ShieldCheck; label: Re
 const CARD_PLANS = PLANS.filter((p) => p.id !== "free");
 
 function PlanCards({ currency }: { currency: Currency }) {
+  const [billing, setBilling] = useState<BillingPeriod>("monthly");
+
+  // Only offer the toggle where at least one plan has a yearly price for
+  // this visitor's currency.
+  const hasYearly = CARD_PLANS.some((p) => p.price.yearly[currency] !== null);
+  const maxDiscount = Math.max(
+    0,
+    ...CARD_PLANS.map((p) => yearlyDiscountPercent(p, currency) ?? 0),
+  );
+
   return (
     <section id="plans" className="max-w-[1600px] mx-auto px-6 pb-20">
+      {hasYearly && (
+        <BillingToggle value={billing} onChange={setBilling} maxDiscount={maxDiscount} />
+      )}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6 items-stretch">
         {CARD_PLANS.map((plan) => (
-          <PlanCard key={plan.id} plan={plan} currency={currency} />
+          <PlanCard
+            key={plan.id}
+            plan={plan}
+            currency={currency}
+            billing={hasYearly ? billing : "monthly"}
+          />
         ))}
       </div>
     </section>
   );
 }
 
-function PlanCard({ plan, currency }: { plan: Plan; currency: Currency }) {
-  const amount = plan.price[currency];
+function BillingToggle({
+  value,
+  onChange,
+  maxDiscount,
+}: {
+  value: BillingPeriod;
+  onChange: (v: BillingPeriod) => void;
+  maxDiscount: number;
+}) {
+  const options: { id: BillingPeriod; label: string }[] = [
+    { id: "monthly", label: "Monthly" },
+    { id: "yearly", label: "Yearly" },
+  ];
+
+  return (
+    <div className="flex justify-center mb-10">
+      <div
+        role="group"
+        aria-label="Billing period"
+        className="inline-flex items-center rounded-full bg-[#F0FDFA] p-1 ring-1 ring-[#14b8a6]/20"
+      >
+        {options.map((o) => {
+          const active = value === o.id;
+          return (
+            <button
+              key={o.id}
+              type="button"
+              aria-pressed={active}
+              onClick={() => onChange(o.id)}
+              className={`inline-flex items-center gap-2 rounded-full px-5 py-2 text-sm font-semibold transition-colors ${
+                active
+                  ? "bg-[#14b8a6] text-white shadow-sm"
+                  : "text-[#0F172A]/70 hover:text-[#0F172A]"
+              }`}
+            >
+              {o.label}
+              {o.id === "yearly" && maxDiscount > 0 && (
+                <span
+                  className={`rounded-full px-2 py-0.5 text-[10px] font-bold uppercase tracking-wide ${
+                    active ? "bg-white/25 text-white" : "bg-[#F97316] text-white"
+                  }`}
+                >
+                  Save up to {maxDiscount}%
+                </span>
+              )}
+            </button>
+          );
+        })}
+      </div>
+    </div>
+  );
+}
+
+function PlanCard({
+  plan,
+  currency,
+  billing,
+}: {
+  plan: Plan;
+  currency: Currency;
+  billing: BillingPeriod;
+}) {
+  // A plan with no yearly price in this currency stays on its monthly price
+  // rather than reading as "Custom".
+  const effectiveBilling =
+    billing === "yearly" && plan.price.yearly[currency] === null ? "monthly" : billing;
+  const amount = plan.price[effectiveBilling][currency];
+  const discount = effectiveBilling === "yearly" ? yearlyDiscountPercent(plan, currency) : null;
+  const suffix = amount !== null && effectiveBilling === "yearly" ? "per year" : plan.priceSuffix;
 
   return (
     <div
@@ -195,14 +286,26 @@ function PlanCard({ plan, currency }: { plan: Plan; currency: Currency }) {
       </div>
 
       <div className="mt-6">
-        <span className="font-display text-4xl font-bold tracking-tight">
-          {amount === null ? "Custom" : formatPrice(amount, currency)}
-        </span>
-        <p className="mt-1 text-xs uppercase tracking-wide text-[#0F172A]/45">{plan.priceSuffix}</p>
+        <div className="flex items-center gap-3">
+          <span className="font-display text-4xl font-bold tracking-tight">
+            {amount === null ? "Custom" : formatPrice(amount, currency)}
+          </span>
+          {discount !== null && (
+            <span className="rounded-full bg-[#F0FDFA] px-2.5 py-1 text-xs font-bold text-[#0d9488] ring-1 ring-[#14b8a6]/25">
+              Save {discount}%
+            </span>
+          )}
+        </div>
+        <p className="mt-1 text-xs uppercase tracking-wide text-[#0F172A]/45">{suffix}</p>
+        {discount !== null && amount !== null && (
+          <p className="mt-1 text-xs text-[#0F172A]/55">
+            ≈ {formatPrice(Math.round(amount / 12), currency)}/month, billed yearly
+          </p>
+        )}
       </div>
 
       <a
-        href={signupHref(plan.id)}
+        href={signupHref(plan.id, effectiveBilling)}
         className={`mt-6 inline-flex items-center justify-center gap-1.5 rounded-full h-12 text-sm font-semibold transition-colors ${
           plan.popular
             ? "bg-[#F97316] hover:bg-[#ea6a10] text-white shadow-md"
@@ -213,12 +316,15 @@ function PlanCard({ plan, currency }: { plan: Plan; currency: Currency }) {
       </a>
 
       <ul className="mt-7 space-y-3 flex-1">
-        {plan.capabilities.map((c) => (
-          <li key={c} className="flex items-start gap-2 text-sm">
-            <Check className="size-4 mt-0.5 shrink-0 text-[#14b8a6]" />
-            <span className="text-[#0F172A]/80">{c}</span>
-          </li>
-        ))}
+        {plan.capabilities.map((c) => {
+          const text = localize(c, currency);
+          return (
+            <li key={text} className="flex items-start gap-2 text-sm">
+              <Check className="size-4 mt-0.5 shrink-0 text-[#14b8a6]" />
+              <span className="text-[#0F172A]/80">{text}</span>
+            </li>
+          );
+        })}
       </ul>
     </div>
   );
@@ -234,7 +340,7 @@ function ComparisonCell({ value }: { value: ComparisonValue }) {
   return <span className="text-[#0F172A]/80">{value}</span>;
 }
 
-function ComparisonTable() {
+function ComparisonTable({ currency }: { currency: Currency }) {
   return (
     <section className="max-w-[1600px] mx-auto px-6 pb-24">
       <div className="text-center mb-10">
@@ -260,7 +366,12 @@ function ComparisonTable() {
           </thead>
           <tbody>
             {COMPARISON.map((group) => (
-              <ComparisonRowsGroup key={group.title} title={group.title} rows={group.rows} />
+              <ComparisonRowsGroup
+                key={group.title}
+                title={group.title}
+                rows={group.rows}
+                currency={currency}
+              />
             ))}
           </tbody>
         </table>
@@ -272,9 +383,11 @@ function ComparisonTable() {
 function ComparisonRowsGroup({
   title,
   rows,
+  currency,
 }: {
   title: string;
-  rows: { label: string; values: Record<PlanId, ComparisonValue> }[];
+  rows: { label: LocalizedText; values: Record<PlanId, ComparisonValue> }[];
+  currency: Currency;
 }) {
   return (
     <>
@@ -286,16 +399,19 @@ function ComparisonRowsGroup({
           {title}
         </td>
       </tr>
-      {rows.map((row) => (
-        <tr key={row.label} className="border-b border-[#0F172A]/8 last:border-b-0 bg-white">
-          <td className="px-6 py-3.5 text-[#0F172A]/80">{row.label}</td>
-          {PLANS.map((plan) => (
-            <td key={plan.id} className="px-4 py-3.5">
-              <ComparisonCell value={row.values[plan.id]} />
-            </td>
-          ))}
-        </tr>
-      ))}
+      {rows.map((row) => {
+        const label = localize(row.label, currency);
+        return (
+          <tr key={label} className="border-b border-[#0F172A]/8 last:border-b-0 bg-white">
+            <td className="px-6 py-3.5 text-[#0F172A]/80">{label}</td>
+            {PLANS.map((plan) => (
+              <td key={plan.id} className="px-4 py-3.5">
+                <ComparisonCell value={row.values[plan.id]} />
+              </td>
+            ))}
+          </tr>
+        );
+      })}
     </>
   );
 }

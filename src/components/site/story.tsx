@@ -24,6 +24,7 @@ import {
   UserPlus,
   Wallet,
 } from "lucide-react";
+import { Link } from "@tanstack/react-router";
 import { Button } from "@/components/ui/button";
 import logoMark from "@/assets/logo-mark.png";
 
@@ -77,12 +78,21 @@ export function SectionHead({
   );
 }
 
-function DemoButton({ className = "" }: { className?: string }) {
+function DemoButton({
+  className = "",
+  label = "See pricing",
+}: {
+  className?: string;
+  label?: string;
+}) {
   return (
     <Button
+      asChild
       className={`h-13 md:h-14 px-7 md:px-8 rounded-full bg-[#F97316] hover:bg-[#ea6a10] text-white font-semibold text-base shadow-lg shadow-[#F97316]/30 ${className}`}
     >
-      Request a Demo <ArrowUpRight className="size-4" />
+      <Link to="/pricing">
+        {label} <ArrowUpRight className="size-4" />
+      </Link>
     </Button>
   );
 }
@@ -175,7 +185,7 @@ export function Hero() {
             transition={{ duration: 0.65, delay: 0.28 }}
             className="mt-8 flex flex-col sm:flex-row gap-3"
           >
-            <DemoButton />
+            <DemoButton label="Start free trial" />
             <Button
               asChild
               variant="outline"
@@ -600,7 +610,7 @@ export function SaveTime() {
             sub="Watch one patient handover run inside PhysioApp. Illustrative, not a measured benchmark — but this is the rhythm clinics settle into."
           />
           <div className="mt-8 flex flex-col sm:flex-row gap-3">
-            <DemoButton />
+            <DemoButton label="Explore plans" />
             <Button
               variant="outline"
               onClick={() => {
@@ -1159,7 +1169,7 @@ export function ClosingCTA() {
             PhysioApp helps you run the clinic without letting the clinic run you.
           </p>
           <div className="mt-10 flex flex-col sm:flex-row gap-3 justify-center">
-            <DemoButton />
+            <DemoButton label="Get started free" />
             <Button
               asChild
               variant="outline"
@@ -1193,8 +1203,13 @@ export function MobileCTABar() {
         show ? "translate-y-0" : "translate-y-full"
       }`}
     >
-      <Button className="w-full h-12 rounded-full bg-[#F97316] hover:bg-[#ea6a10] text-white font-semibold shadow-lg">
-        Request a Demo <ArrowUpRight className="size-4" />
+      <Button
+        asChild
+        className="w-full h-12 rounded-full bg-[#F97316] hover:bg-[#ea6a10] text-white font-semibold shadow-lg"
+      >
+        <Link to="/pricing">
+          View pricing <ArrowUpRight className="size-4" />
+        </Link>
       </Button>
     </div>
   );

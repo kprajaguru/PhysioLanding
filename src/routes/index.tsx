@@ -1,4 +1,4 @@
-import { createFileRoute } from "@tanstack/react-router";
+import { createFileRoute, Link } from "@tanstack/react-router";
 import { Button } from "@/components/ui/button";
 import {
   Accordion,
@@ -94,7 +94,6 @@ function Index() {
         <PatientFlow />
         <BuiltForEveryone />
 
-        <Pricing isUK={isUK} />
         <FAQ />
         <ClosingCTA />
       </main>
@@ -132,8 +131,13 @@ function Nav() {
           ))}
         </div>
 
-        <Button className="rounded-full bg-[#F97316] hover:bg-[#ea6a10] text-white shadow-md h-9 px-4 ml-2 text-sm">
-          Request Demo <ArrowUpRight className="size-4" />
+        <Button
+          asChild
+          className="rounded-full bg-[#F97316] hover:bg-[#ea6a10] text-white shadow-md h-9 px-4 ml-2 text-sm"
+        >
+          <Link to="/pricing">
+            View plans <ArrowUpRight className="size-4" />
+          </Link>
         </Button>
       </div>
     </nav>
@@ -379,8 +383,13 @@ function FeatureHub() {
             transition={{ duration: 0.55, delay: 0.3 }}
             className="mt-7"
           >
-            <Button className="rounded-full bg-[#F97316] hover:bg-[#ea6a10] text-white shadow-lg px-7 py-6 text-base font-semibold">
-              Request a Demo <ArrowUpRight className="size-4 ml-1" />
+            <Button
+              asChild
+              className="rounded-full bg-[#F97316] hover:bg-[#ea6a10] text-white shadow-lg px-7 py-6 text-base font-semibold"
+            >
+              <Link to="/pricing">
+                Find your plan <ArrowUpRight className="size-4 ml-1" />
+              </Link>
             </Button>
           </motion.div>
         </div>
@@ -1196,95 +1205,6 @@ function ReferralScreen() {
   );
 }
 
-function Pricing({ isUK }: { isUK: boolean }) {
-  const plans = [
-    {
-      n: "Starter",
-      p: isUK ? "£15" : "₹1,099",
-      s: "For solo therapists",
-      feats: [
-        "Up to 100 patients",
-        isUK ? "Billing & VAT invoicing" : "Billing & GST invoicing",
-        "Email support",
-        "Up to 2 branches",
-      ],
-      hi: false,
-    },
-    {
-      n: "Advance",
-      p: isUK ? "£45" : "₹3,499",
-      s: "For growing clinics",
-      feats: [
-        "Unlimited patients",
-        "Exercise video library",
-        "Priority support",
-        "Up to 5 branches",
-      ],
-      hi: true,
-    },
-    {
-      n: "Enterprise",
-      p: "Custom",
-      s: "For multi-branch",
-      feats: ["Everything in Advance", "Multi-branch reports", "SSO & audit logs", "Dedicated CSM"],
-      hi: false,
-    },
-  ];
-  return (
-    <section id="pricing" className="max-w-6xl mx-auto px-6 py-28">
-      <div className="text-center mb-14 max-w-2xl mx-auto">
-        <p className="text-xs uppercase tracking-[0.2em] text-[#14b8a6] font-bold mb-4">Pricing</p>
-        <h2 className="font-display text-4xl md:text-5xl font-bold tracking-tight">
-          Simple pricing. Serious recovery.
-        </h2>
-        <p className="mt-4 text-[#0F172A]/70 text-lg">Start free for 14 days. No card required.</p>
-      </div>
-      <div className="grid md:grid-cols-3 gap-6 items-stretch">
-        {plans.map((p) => (
-          <div
-            key={p.n}
-            className={`relative rounded-3xl p-8 transition ${
-              p.hi
-                ? "bg-[#0F172A] text-white shadow-2xl shadow-[#14b8a6]/25 md:-translate-y-4"
-                : "bg-white border border-[#0F172A]/10 hover:shadow-xl"
-            }`}
-          >
-            {p.hi && (
-              <span className="absolute -top-3 left-1/2 -translate-x-1/2 px-3 py-1 bg-[#F97316] text-white text-xs font-bold rounded-full">
-                MOST POPULAR
-              </span>
-            )}
-            <p className={`text-sm font-semibold ${p.hi ? "text-white/70" : "text-[#0F172A]/60"}`}>
-              {p.n}
-            </p>
-            <p className="font-display text-5xl font-bold mt-2">{p.p}</p>
-            <p className={`text-sm mt-1 ${p.hi ? "text-white/60" : "text-[#0F172A]/60"}`}>
-              {p.s} · per month
-            </p>
-            <Button
-              className={`w-full mt-6 rounded-full h-12 font-semibold ${
-                p.hi
-                  ? "bg-[#F97316] hover:bg-[#ea6a10] text-white"
-                  : "bg-[#0F172A] hover:bg-[#0F172A]/90 text-white"
-              }`}
-            >
-              {p.hi ? "Request Demo" : "Get started"}
-            </Button>
-            <ul className="mt-6 space-y-3">
-              {p.feats.map((f) => (
-                <li key={f} className="flex items-start gap-2 text-sm">
-                  <Check className="size-4 mt-0.5 shrink-0 text-[#14b8a6]" />
-                  <span className={p.hi ? "text-white/85" : "text-[#0F172A]/80"}>{f}</span>
-                </li>
-              ))}
-            </ul>
-          </div>
-        ))}
-      </div>
-    </section>
-  );
-}
-
 /* ---------- FAQ ---------- */
 function FAQ() {
   const qs = [
@@ -1337,6 +1257,7 @@ function FAQ() {
 
 /* ---------- FOOTER ---------- */
 const LEGAL_HREFS: Record<string, string> = {
+  Pricing: "/pricing",
   "Privacy Policy": "/privacy-policy",
   "Terms of Service": "/terms-of-service",
   "Data Deletion": "/data-deletion",
