@@ -155,43 +155,27 @@ function TrustPoint({ icon: Icon, label }: { icon: typeof ShieldCheck; label: Re
 const CARD_PLANS = PLANS.filter((p) => p.id !== "free");
 
 function PlanCards({ currency }: { currency: Currency }) {
-  const [billing, setBilling] = useState<BillingPeriod>("monthly");
-
-  // Only offer the toggle where at least one plan has a yearly price for
-  // this visitor's currency.
-  const hasYearly = CARD_PLANS.some((p) => p.price.yearly[currency] !== null);
-  const maxDiscount = Math.max(
-    0,
-    ...CARD_PLANS.map((p) => yearlyDiscountPercent(p, currency) ?? 0),
-  );
-
   return (
     <section id="plans" className="max-w-[1600px] mx-auto px-6 pb-20">
-      {hasYearly && (
-        <BillingToggle value={billing} onChange={setBilling} maxDiscount={maxDiscount} />
-      )}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6 items-stretch">
         {CARD_PLANS.map((plan) => (
-          <PlanCard
-            key={plan.id}
-            plan={plan}
-            currency={currency}
-            billing={hasYearly ? billing : "monthly"}
-          />
+          <PlanCard key={plan.id} plan={plan} currency={currency} />
         ))}
       </div>
     </section>
   );
 }
 
+// Compact Monthly | Yearly switch that lives inside a plan card, next to the
+// price it controls. The Yearly side advertises the saving when there is one.
 function BillingToggle({
   value,
   onChange,
-  maxDiscount,
+  discount,
 }: {
   value: BillingPeriod;
   onChange: (v: BillingPeriod) => void;
-  maxDiscount: number;
+  discount: number | null;
 }) {
   const options: { id: BillingPeriod; label: string }[] = [
     { id: "monthly", label: "Monthly" },
@@ -199,59 +183,51 @@ function BillingToggle({
   ];
 
   return (
-    <div className="flex justify-center mb-10">
-      <div
-        role="group"
-        aria-label="Billing period"
-        className="inline-flex items-center rounded-full bg-[#F0FDFA] p-1 ring-1 ring-[#14b8a6]/20"
-      >
-        {options.map((o) => {
-          const active = value === o.id;
-          return (
-            <button
-              key={o.id}
-              type="button"
-              aria-pressed={active}
-              onClick={() => onChange(o.id)}
-              className={`inline-flex items-center gap-2 rounded-full px-5 py-2 text-sm font-semibold transition-colors ${
-                active
-                  ? "bg-[#14b8a6] text-white shadow-sm"
-                  : "text-[#0F172A]/70 hover:text-[#0F172A]"
-              }`}
-            >
-              {o.label}
-              {o.id === "yearly" && maxDiscount > 0 && (
-                <span
-                  className={`rounded-full px-2 py-0.5 text-[10px] font-bold uppercase tracking-wide ${
-                    active ? "bg-white/25 text-white" : "bg-[#F97316] text-white"
-                  }`}
-                >
-                  Save up to {maxDiscount}%
-                </span>
-              )}
-            </button>
-          );
-        })}
-      </div>
+    <div
+      role="group"
+      aria-label="Billing period"
+      className="inline-flex h-9 items-center rounded-full bg-[#F0FDFA] p-1 ring-1 ring-[#14b8a6]/20"
+    >
+      {options.map((o) => {
+        const active = value === o.id;
+        return (
+          <button
+            key={o.id}
+            type="button"
+            aria-pressed={active}
+            onClick={() => onChange(o.id)}
+            className={`inline-flex items-center gap-1.5 rounded-full px-3.5 py-1.5 text-xs font-semibold transition-colors ${
+              active
+                ? "bg-[#14b8a6] text-white shadow-sm"
+                : "text-[#0F172A]/70 hover:text-[#0F172A]"
+            }`}
+          >
+            {o.label}
+            {o.id === "yearly" && discount !== null && (
+              <span
+                className={`rounded-full px-1.5 py-0.5 text-[10px] font-bold uppercase tracking-wide ${
+                  active ? "bg-white/25 text-white" : "bg-[#F97316] text-white"
+                }`}
+              >
+                Save {discount}%
+              </span>
+            )}
+          </button>
+        );
+      })}
     </div>
   );
 }
 
-function PlanCard({
-  plan,
-  currency,
-  billing,
-}: {
-  plan: Plan;
-  currency: Currency;
-  billing: BillingPeriod;
-}) {
-  // A plan with no yearly price in this currency stays on its monthly price
-  // rather than reading as "Custom".
-  const effectiveBilling =
-    billing === "yearly" && plan.price.yearly[currency] === null ? "monthly" : billing;
+function PlanCard({ plan, currency }: { plan: Plan; currency: Currency }) {
+  const [billing, setBilling] = useState<BillingPeriod>("monthly");
+
+  // The toggle only exists on cards that have both a monthly and a yearly
+  // price in this currency (so not Enterprise, which is "Custom").
+  const canToggle = !!plan.price.monthly[currency] && !!plan.price.yearly[currency];
+  const effectiveBilling = canToggle ? billing : "monthly";
   const amount = plan.price[effectiveBilling][currency];
-  const discount = effectiveBilling === "yearly" ? yearlyDiscountPercent(plan, currency) : null;
+  const saving = canToggle ? yearlyDiscountPercent(plan, currency) : null;
   const suffix = amount !== null && effectiveBilling === "yearly" ? "per year" : plan.priceSuffix;
 
   return (
@@ -286,22 +262,25 @@ function PlanCard({
       </div>
 
       <div className="mt-6">
-        <div className="flex items-center gap-3">
+        {canToggle ? (
+          <BillingToggle value={billing} onChange={setBilling} discount={saving} />
+        ) : (
+          // Same height as the toggle so prices stay aligned across the row.
+          <div className="h-9" aria-hidden />
+        )}
+
+        <div className="mt-4">
           <span className="font-display text-4xl font-bold tracking-tight">
             {amount === null ? "Custom" : formatPrice(amount, currency)}
           </span>
-          {discount !== null && (
-            <span className="rounded-full bg-[#F0FDFA] px-2.5 py-1 text-xs font-bold text-[#0d9488] ring-1 ring-[#14b8a6]/25">
-              Save {discount}%
-            </span>
-          )}
-        </div>
-        <p className="mt-1 text-xs uppercase tracking-wide text-[#0F172A]/45">{suffix}</p>
-        {discount !== null && amount !== null && (
-          <p className="mt-1 text-xs text-[#0F172A]/55">
-            ≈ {formatPrice(Math.round(amount / 12), currency)}/month, billed yearly
+          <p className="mt-1 text-xs uppercase tracking-wide text-[#0F172A]/45">{suffix}</p>
+          {/* Fixed-height line so toggling doesn't make the card jump. */}
+          <p className="mt-1 h-4 text-xs text-[#0F172A]/55">
+            {effectiveBilling === "yearly" && saving !== null && amount !== null
+              ? `≈ ${formatPrice(Math.round(amount / 12), currency)}/month, billed yearly`
+              : null}
           </p>
-        )}
+        </div>
       </div>
 
       <a
