@@ -7,7 +7,7 @@ type FooterLink = { label: string; to: string };
 
 const PRODUCT_LINKS: FooterLink[] = [
   { label: "Features", to: "/#features" },
-  { label: "Pricing", to: "/#pricing" },
+  { label: "Pricing", to: "/pricing" },
   { label: "Integrations", to: "/#" },
   { label: "Changelog", to: "/#" },
 ];
